@@ -7,13 +7,24 @@ import { faCloudSun } from "@fortawesome/free-solid-svg-icons";
 import { faSun } from "@fortawesome/free-solid-svg-icons";
 import { faCloud } from "@fortawesome/free-solid-svg-icons";
 
-export default function Home() {
+export default async function Home() {
+  const curr_time = new Date().toLocaleString("en-us", {
+    weekday: "long",
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "numeric",
+  });
+  const { city, latitude, longitude } = await getCurrentLocationData();
+  const weatherData = await getLiveWeatherData(latitude, longitude);
+  const { currentTemperature, minCurrentTemperature } =
+    prepareWeatherData(weatherData);
   return (
     <main className="bg-[url('https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')] bg-cover bg-center flex justify-center items-center min-h-screen">
       <div className="bg-white/30 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
         <div className="bg-black/30 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
-          <span className="text-sm">THURSDAY 10:40 PM</span>
-          <span className="text-2xl font-bold">VANCOUVER</span>
+          <span className="text-sm">{curr_time}</span>
+          <span className="text-2xl font-bold">{city}</span>
         </div>
         <div className="flex w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
           <div className="w-28">
@@ -28,7 +39,7 @@ export default function Home() {
           </div>
           <div className="flex flex-col gap-2 text-[#fef8bc]">
             <div className="flex gap-2 justify-start">
-              <span className="text-6xl sm:text-8xl">9</span>
+              <span className="text-6xl sm:text-8xl">{currentTemperature}</span>
               <div className="mt-3">
                 <p className="text-xl sm:text-3xl">
                   <span>
@@ -41,7 +52,7 @@ export default function Home() {
                 </p>
                 <p>
                   <span className="text-xs sm:text-md">
-                    MIN 3 <sup>o</sup>C
+                    MIN {minCurrentTemperature} <sup>o</sup>C
                   </span>
                 </p>
               </div>
@@ -116,3 +127,29 @@ export default function Home() {
     </main>
   );
 }
+
+const prepareWeatherData = (weatherData) => {
+  return {
+    currentTemperature: Math.floor(weatherData.current_weather.temperature),
+    minCurrentTemperature: Math.floor(weatherData.daily.temperature_2m_min[0]),
+  };
+};
+
+const getCurrentLocationData = async () => {
+  const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
+const getLiveWeatherData = async (latitude, longitude) => {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto&models=best_match`,
+    { cache: "no-store" }
+  );
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
