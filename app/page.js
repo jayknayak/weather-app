@@ -37,12 +37,12 @@ export default async function Home() {
   } = prepareWeatherData(weatherData);
   return (
     <main className="bg-[url('https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')] bg-cover bg-center flex justify-center items-center min-h-screen">
-      <div className="bg-white/30 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
+      <div className="bg-white/30 w-[60vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
         <div className="bg-black/30 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
           <span className="text-sm">{curr_time}</span>
           <span className="text-2xl font-bold">{city}</span>
         </div>
-        <div className="flex w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
+        <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
           <div className="w-32">
             <Image
               width={500}
@@ -154,7 +154,7 @@ const prepareWeatherData = (weatherData) => {
 };
 
 const getCurrentLocationData = async () => {
-  const res = await fetch("https://ipapi.co/json/", { cache: "no-store" });
+  const res = await fetch("https://ipapi.co/json/");
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
@@ -164,7 +164,7 @@ const getCurrentLocationData = async () => {
 const getLiveWeatherData = async (latitude, longitude) => {
   const res = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto&models=best_match`,
-    { cache: "no-store" }
+    { next: { revalidate: 60 } }
   );
   if (!res.ok) {
     throw new Error("Failed to fetch data");
