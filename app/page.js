@@ -68,7 +68,7 @@ export default async function Home() {
           <span className="text-2xl font-bold">{city}</span>
         </div>
         <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
-          <div className="w-40">
+          <div className="w-28 sm:w-40">
             <Image
               width={500}
               height={500}
@@ -134,7 +134,7 @@ export default async function Home() {
                 return (
                   <div
                     key={index}
-                    className="bg-black/30 flex flex-row justify-between sm:flex-col grow gap-1 p-1 items-center text-center"
+                    className="bg-black/30 flex flex-row justify-around sm:flex-col grow gap-1 p-1 items-center text-center"
                   >
                     <span className="text-sm sm:text-md">{nextDay}</span>
                     {/* <FontAwesomeIcon
