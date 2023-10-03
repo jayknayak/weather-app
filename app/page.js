@@ -7,6 +7,25 @@ import { faCloudSun } from "@fortawesome/free-solid-svg-icons";
 import { faSun } from "@fortawesome/free-solid-svg-icons";
 import { faCloud } from "@fortawesome/free-solid-svg-icons";
 
+const getCurrentLocationData = async () => {
+  const res = await fetch("https://ipapi.co/json/");
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
+const getLiveWeatherData = async (latitude, longitude) => {
+  const res = await fetch(
+    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto&models=best_match`,
+    { next: { revalidate: 60 } }
+  );
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
+};
+
 const weekDays = {
   0: "Mon",
   1: "Tue",
@@ -29,12 +48,18 @@ export default async function Home() {
   const weatherData = await getLiveWeatherData(latitude, longitude);
   const {
     currentTemperature,
+    currentWeatherCode,
+    isDay,
     minCurrentTemperature,
     relativeHumidity,
     currentWindspeed,
     precipitationProbability,
-    weatherForecast,
+    nextWeatherForecast,
   } = prepareWeatherData(weatherData);
+  const currentWeatherIllustrations = addAppropriateIllustration(
+    currentWeatherCode,
+    isDay
+  );
   return (
     <main className="bg-[url('https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')] bg-cover bg-center flex justify-center items-center min-h-screen">
       <div className="bg-white/30 w-[60vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
@@ -43,13 +68,17 @@ export default async function Home() {
           <span className="text-2xl font-bold">{city}</span>
         </div>
         <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
-          <div className="w-32">
+          <div className="w-40">
             <Image
               width={500}
               height={500}
               className="w-full"
-              src="https://creazilla-store.fra1.digitaloceanspaces.com/cliparts/19402/cat-sleeping-on-the-moon-clipart-xl.png"
-              alt=""
+              src={
+                currentWeatherIllustrations && currentWeatherIllustrations[0]
+              }
+              alt={
+                currentWeatherIllustrations && currentWeatherIllustrations[1]
+              }
               priority
             />
           </div>
@@ -96,8 +125,11 @@ export default async function Home() {
           </div>
         </div>
         <div className="flex flex-col sm:flex-row gap-1 justify-between p-1 sm:p-4 w-full text-[#fef8bc] mt-8">
-          {weatherForecast.map(
-            ({ nextDay, nextDayTempMax, nextDayTempMin }, index) => {
+          {nextWeatherForecast.map(
+            (
+              { nextDay, nextDayTempMax, nextDayTempMin, nextDayIllustration },
+              index
+            ) => {
               if (index > 0)
                 return (
                   <div
@@ -105,10 +137,19 @@ export default async function Home() {
                     className="bg-black/30 flex flex-row justify-between sm:flex-col grow gap-1 p-1 items-center text-center"
                   >
                     <span className="text-sm sm:text-md">{nextDay}</span>
-                    <FontAwesomeIcon
+                    {/* <FontAwesomeIcon
                       icon={faCloud}
                       className="text-[#64dcfd] w-4"
-                    />
+                    /> */}
+                    <div className="w-8">
+                      <Image
+                        src={nextDayIllustration && nextDayIllustration[0]}
+                        alt={nextDayIllustration && nextDayIllustration[1]}
+                        width={300}
+                        height={300}
+                        className="w-full"
+                      />
+                    </div>
                     <span className="text-xs">
                       {nextDayTempMax}
                       <sup>o</sup> / {nextDayTempMin}
@@ -130,6 +171,7 @@ const prepareWeatherData = (weatherData) => {
     time: forecastTime,
     temperature_2m_max: forecastTempMax,
     temperature_2m_min: forecastTempMin,
+    weathercode: dailyWeatherCodes,
   } = daily;
   const timeIndex =
     hourly.time.indexOf(
@@ -137,37 +179,94 @@ const prepareWeatherData = (weatherData) => {
         (time) => new Date(time).getTime() >= new Date().getTime()
       )
     ) - 1;
-  const weatherForecast = forecastTime.map((time, index) => ({
+  const nextWeatherForecast = forecastTime.map((time, index) => ({
     nextDay: weekDays[new Date(time).getDay()],
     nextDayTempMax: Math.ceil(forecastTempMax[index]),
     nextDayTempMin: Math.ceil(forecastTempMin[index]),
+    nextDayIllustration: addAppropriateIllustration(dailyWeatherCodes[index]),
   }));
 
   return {
     currentTemperature: Math.ceil(current_weather.temperature),
+    currentWeatherCode: current_weather.weathercode,
+    isDay: current_weather.is_day,
     minCurrentTemperature: Math.ceil(daily.temperature_2m_min[0]),
     relativeHumidity: hourly.relativehumidity_2m[timeIndex],
     currentWindspeed: current_weather.windspeed.toFixed(1),
     precipitationProbability: hourly.precipitation_probability[timeIndex],
-    weatherForecast: weatherForecast,
+    nextWeatherForecast: nextWeatherForecast,
   };
 };
 
-const getCurrentLocationData = async () => {
-  const res = await fetch("https://ipapi.co/json/");
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
+const addAppropriateIllustration = (weathercode, isDay = 1) => {
+  if (weathercode === 0) {
+    // Clear sky
+    if (isDay === 1)
+      // (day)
+      return ["https://i.ibb.co/xDpF63y/day-clear.png", "Clear day"];
+    //(night)
+    else
+      return [
+        "https://i.ibb.co/PrQfyk1/night-half-moon-clear.png",
+        "Clear night",
+      ];
+  } else if (weathercode === 1 || weathercode === 2 || weathercode === 3) {
+    if (isDay === 1) {
+      // Mainly clear (day)
+      return [
+        "https://i.ibb.co/3YD4Bc1/day-partial-cloud.png",
+        "Mainly clear day",
+      ];
+    } else {
+      // Mainly clear (night)
+      return [
+        "https://i.ibb.co/6tLnLCR/night-full-moon-partial-cloud.png",
+        "Mainly clear night",
+      ];
+    }
+  } else if (weathercode >= 45 && weathercode <= 48) {
+    // Fog
+    return ["https://i.ibb.co/WpV7VDz/fog.png", "Fog"];
+  } else if (
+    (weathercode >= 51 && weathercode <= 67) ||
+    (weathercode >= 80 && weathercode <= 82)
+  ) {
+    if (isDay === 1) {
+      // Rain (day)
+      return ["https://i.ibb.co/pJxyNwy/day-rain.png", "Rainy day"];
+    } else {
+      // Rain (night)
+      return [
+        "https://i.ibb.co/ZcQmh89/night-full-moon-rain.png",
+        "Rainy night",
+      ];
+    }
+  } else if (
+    (weathercode >= 71 && weathercode <= 77) ||
+    weathercode === 85 ||
+    weathercode === 86
+  ) {
+    if (isDay === 1)
+      // Snow (day)
+      return ["https://i.ibb.co/3rdTxwb/night-full-moon-snow.png", "Snowy day"];
+    // Snow (night)
+    else
+      return [
+        "https://i.ibb.co/3rdTxwb/night-full-moon-snow.png",
+        "Snowy night",
+      ];
+  } else if (weathercode >= 95 && weathercode <= 99) {
+    // Thunder (day)
+    if (isDay === 1)
+      return [
+        "https://i.ibb.co/gVmrPkV/day-rain-thunder.png",
+        "Thunderstorm day",
+      ];
+    // Thunder (night)
+    else
+      return [
+        "https://i.ibb.co/qxWQ9PY/night-full-moon-rain-thunder.png",
+        "Thunderstorm night",
+      ];
   }
-  return res.json();
-};
-
-const getLiveWeatherData = async (latitude, longitude) => {
-  const res = await fetch(
-    `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto&models=best_match`,
-    { next: { revalidate: 60 } }
-  );
-  if (!res.ok) {
-    throw new Error("Failed to fetch data");
-  }
-  return res.json();
 };
