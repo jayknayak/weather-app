@@ -1,11 +1,7 @@
 import Image from "next/image";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDroplet } from "@fortawesome/free-solid-svg-icons";
+import { faDroplet, faUmbrella } from "@fortawesome/free-solid-svg-icons";
 import { faWind } from "@fortawesome/free-solid-svg-icons";
-import { faSnowflake } from "@fortawesome/free-solid-svg-icons";
-import { faCloudSun } from "@fortawesome/free-solid-svg-icons";
-import { faSun } from "@fortawesome/free-solid-svg-icons";
-import { faCloud } from "@fortawesome/free-solid-svg-icons";
 
 const getCurrentLocationData = async () => {
   const res = await fetch("https://ipapi.co/json/");
@@ -68,7 +64,7 @@ export default async function Home() {
           <span className="text-2xl font-bold">{city}</span>
         </div>
         <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
-          <div className="w-28 sm:w-40">
+          <div className="group relative w-28 sm:w-40">
             <Image
               width={500}
               height={500}
@@ -81,6 +77,9 @@ export default async function Home() {
               }
               priority
             />
+            <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-sm text-gray-300 rounded-md -top-1/4 left-6/8 mx-auto group-hover:opacity-100">
+              {currentWeatherIllustrations && currentWeatherIllustrations[1]}
+            </span>
           </div>
           <div className="flex flex-col gap-2 text-[#fef8bc]">
             <div className="flex gap-2 justify-start">
@@ -99,26 +98,35 @@ export default async function Home() {
               </div>
             </div>
             <div className="bg-black/30 flex py-2 px-2 items-center sm:px-4 gap-2 sm:gap-4">
-              <div className="flex flex-col items-center gap-1">
+              <div className="group relative flex flex-col items-center gap-1">
                 <FontAwesomeIcon
                   icon={faDroplet}
                   className="text-[#64dcfd] w-3"
                 />
                 <span className="text-xs sm:text-sm">{relativeHumidity}%</span>
+                <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md top-[100%] left-6/8 mx-auto group-hover:opacity-100">
+                  Humidity
+                </span>
               </div>
-              <div className="flex flex-col items-center gap-1">
+              <div className="group relative flex flex-col items-center gap-1">
                 <FontAwesomeIcon icon={faWind} className="text-[#64dcfd] w-4" />
                 <span className="text-xs sm:text-sm">
                   {currentWindspeed} km/h
                 </span>
+                <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md top-[100%] left-6/8 mx-auto group-hover:opacity-100">
+                  Wind
+                </span>
               </div>
-              <div className="flex flex-col items-center gap-1">
+              <div className="group relative flex flex-col items-center gap-1">
                 <FontAwesomeIcon
-                  icon={faSnowflake}
+                  icon={faUmbrella}
                   className="text-[#64dcfd] w-4"
                 />
                 <span className="text-xs sm:text-sm">
                   {precipitationProbability}%
+                </span>
+                <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md top-[100%] left-6/8 mx-auto group-hover:opacity-100">
+                  Precipitation
                 </span>
               </div>
             </div>
@@ -134,14 +142,14 @@ export default async function Home() {
                 return (
                   <div
                     key={index}
-                    className="bg-black/30 flex flex-row justify-around sm:flex-col grow gap-1 p-1 items-center text-center"
+                    className="group relative bg-black/30 flex flex-row justify-around sm:flex-col grow gap-1 p-1 items-center text-center"
                   >
                     <span className="text-sm sm:text-md">{nextDay}</span>
                     {/* <FontAwesomeIcon
                       icon={faCloud}
                       className="text-[#64dcfd] w-4"
                     /> */}
-                    <div className="w-8">
+                    <div className=" w-8 ">
                       <Image
                         src={nextDayIllustration && nextDayIllustration[0]}
                         alt={nextDayIllustration && nextDayIllustration[1]}
@@ -154,6 +162,9 @@ export default async function Home() {
                       {nextDayTempMax}
                       <sup>o</sup> / {nextDayTempMin}
                       <sup>o</sup>
+                    </span>
+                    <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md -top-1/3 left-6/8 mx-auto group-hover:opacity-100">
+                      {nextDayIllustration && nextDayIllustration[1]}
                     </span>
                   </div>
                 );
@@ -203,7 +214,7 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
     // Clear sky
     if (isDay === 1)
       // (day)
-      return ["https://i.ibb.co/xDpF63y/day-clear.png", "Clear day"];
+      return ["https://i.ibb.co/xDpF63y/day-clear.png", "Sunny"];
     //(night)
     else
       return [
@@ -215,13 +226,13 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
       // Mainly clear (day)
       return [
         "https://i.ibb.co/3YD4Bc1/day-partial-cloud.png",
-        "Mainly clear day",
+        "Partial Cloudy",
       ];
     } else {
       // Mainly clear (night)
       return [
         "https://i.ibb.co/6tLnLCR/night-full-moon-partial-cloud.png",
-        "Mainly clear night",
+        "Partial Cloudy",
       ];
     }
   } else if (weathercode >= 45 && weathercode <= 48) {
@@ -233,7 +244,7 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
   ) {
     if (isDay === 1) {
       // Rain (day)
-      return ["https://i.ibb.co/pJxyNwy/day-rain.png", "Rainy day"];
+      return ["https://i.ibb.co/pJxyNwy/day-rain.png", "Rainy"];
     } else {
       // Rain (night)
       return [
@@ -248,7 +259,7 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
   ) {
     if (isDay === 1)
       // Snow (day)
-      return ["https://i.ibb.co/3rdTxwb/night-full-moon-snow.png", "Snowy day"];
+      return ["https://i.ibb.co/3rdTxwb/night-full-moon-snow.png", "Snowy"];
     // Snow (night)
     else
       return [
@@ -258,10 +269,7 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
   } else if (weathercode >= 95 && weathercode <= 99) {
     // Thunder (day)
     if (isDay === 1)
-      return [
-        "https://i.ibb.co/gVmrPkV/day-rain-thunder.png",
-        "Thunderstorm day",
-      ];
+      return ["https://i.ibb.co/gVmrPkV/day-rain-thunder.png", "Thunderstorm"];
     // Thunder (night)
     else
       return [
