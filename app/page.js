@@ -60,7 +60,7 @@ export default async function Home() {
   );
   return (
     <main className="bg-[url('https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')] bg-cover bg-center flex justify-center items-center min-h-screen">
-      <div className="bg-white/30 w-[60vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
+      <div className="bg-white/30 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
         <div className="bg-black/30 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
           <span className="text-sm">{curr_time}</span>
           <span className="text-2xl font-bold">{city}</span>
