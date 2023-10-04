@@ -4,7 +4,9 @@ import { faDroplet, faUmbrella } from "@fortawesome/free-solid-svg-icons";
 import { faWind } from "@fortawesome/free-solid-svg-icons";
 
 const getCurrentLocationData = async () => {
-  const res = await fetch("https://ipapi.co/json/");
+  const res = await fetch("https://ipapi.co/json/", {
+    next: { revalidate: 60 },
+  });
   if (!res.ok) {
     throw new Error("Failed to fetch data");
   }
