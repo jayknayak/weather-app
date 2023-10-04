@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDroplet, faUmbrella } from "@fortawesome/free-solid-svg-icons";
 import { faWind } from "@fortawesome/free-solid-svg-icons";
 import DisplayCurrentTime from "./displayCurrentTime";
+import GetCurrentLocation from "./getCurrentLocation";
 
 const getCurrentLocationData = async () => {
   const res = await fetch("https://ipapi.co/json/", {
@@ -13,7 +14,6 @@ const getCurrentLocationData = async () => {
   }
   return res.json();
 };
-
 const getLiveWeatherData = async (latitude, longitude) => {
   const res = await fetch(
     `https://api.open-meteo.com/v1/forecast?latitude=${latitude}&longitude=${longitude}&hourly=temperature_2m,relativehumidity_2m,precipitation_probability,is_day&daily=weathercode,temperature_2m_max,temperature_2m_min&current_weather=true&timezone=auto&models=best_match`,
@@ -57,6 +57,7 @@ export default async function Home() {
       <div className="bg-white/30 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
         <div className="bg-black/30 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
           <DisplayCurrentTime />
+          <GetCurrentLocation />
           <span className="text-2xl font-bold">{city}</span>
         </div>
         <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
