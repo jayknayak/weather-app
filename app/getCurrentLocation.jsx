@@ -1,10 +1,14 @@
 "use client";
+import { useEffect } from "react";
+
 export default function GetCurrentLocation() {
-  navigator.geolocation.getCurrentPosition(
-    successCallback,
-    errorCallback,
-    options
-  );
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition(
+      successCallback,
+      errorCallback,
+      options
+    );
+  });
 }
 const successCallback = (position) => {
   console.log("position is:", position);
