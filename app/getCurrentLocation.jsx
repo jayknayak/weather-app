@@ -1,25 +1,38 @@
 "use client";
+import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { useEffect } from "react";
 
 export default function GetCurrentLocation() {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   useEffect(() => {
-    navigator.geolocation.getCurrentPosition(
-      successCallback,
-      errorCallback,
-      options
-    );
-  });
-}
-const successCallback = (position) => {
-  console.log("position is:", position);
-  console.log("Latitude is :", position.coords.latitude);
-  console.log("Longitude is :", position.coords.longitude);
-};
+    fetchLocationData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-const errorCallback = (error) => {
-  throw new Error("Failed to fetch data", error);
-};
-const options = {
-  enableHighAccuracy: true,
-  timeout: 10000,
+  const fetchLocationData = async () => {
+    const currentLocationData = await getCurrentLocationData();
+    const newParams = new URLSearchParams(searchParams.toString());
+    if (currentLocationData) {
+      // setCity(currentLocationData.city);
+      newParams.set("loc", [
+        currentLocationData.city,
+        currentLocationData.latitude,
+        currentLocationData.longitude,
+      ]);
+    } else {
+      newParams.delete("q");
+    }
+    router.push(`${pathname}?${newParams}`);
+  };
+}
+
+const getCurrentLocationData = async () => {
+  const res = await fetch("https://ipapi.co/json/", {
+    next: { revalidate: 900 },
+  });
+  if (!res.ok) {
+    throw new Error("Failed to fetch data");
+  }
+  return res.json();
 };
