@@ -38,7 +38,7 @@ export default async function Home({ searchParams }) {
   let currentWeatherIllustrations = null;
   if (selectedSearch) {
     const location = selectedSearch.split(",");
-     city = location[0];
+    city = location[0];
     const latitude = location[1];
     const longitude = location[2];
     weatherData = await getLiveWeatherData(latitude, longitude);
@@ -60,7 +60,7 @@ export default async function Home({ searchParams }) {
         {weatherData ? (
           <>
             <div className="flex flex-col sm:flex-row w-full p-2 sm:p-4 gap-4 sm:gap-8 justify-center items-center mt-4">
-              <div className="group relative w-28 sm:w-40">
+              <div className="group relative w-40 sm:w-48">
                 <Image
                   width={500}
                   height={500}
@@ -75,7 +75,7 @@ export default async function Home({ searchParams }) {
                   }
                   priority
                 />
-                <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-sm text-gray-300 rounded-md -top-1/4 left-6/8 mx-auto group-hover:opacity-100">
+                <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-sm text-gray-300 rounded-md -top-[5px] left-[5px] mx-auto group-hover:opacity-100">
                   {currentWeatherIllustrations &&
                     currentWeatherIllustrations[1]}
                 </span>
@@ -154,14 +154,14 @@ export default async function Home({ searchParams }) {
                     return (
                       <div
                         key={index}
-                        className="group relative bg-black/30 flex flex-row justify-around sm:flex-col grow gap-1 p-1 items-center text-center"
+                        className="group relative bg-black/30 flex flex-row justify-around sm:flex-col flex-1 gap-1 p-1 items-center text-center"
                       >
                         <span className="text-sm sm:text-md">{nextDay}</span>
                         {/* <FontAwesomeIcon
                       icon={faCloud}
                       className="text-[#64dcfd] w-4"
                     /> */}
-                        <div className=" w-8 ">
+                        <div className="w-10">
                           <Image
                             src={nextDayIllustration && nextDayIllustration[0]}
                             alt={nextDayIllustration && nextDayIllustration[1]}
@@ -175,7 +175,7 @@ export default async function Home({ searchParams }) {
                           <sup>o</sup> / {nextDayTempMin}
                           <sup>o</sup>
                         </span>
-                        <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md -top-1/3 left-6/8 mx-auto group-hover:opacity-100">
+                        <span className="absolute opacity-0 transition-opacity duration-200 ease-in bg-black/50 p-1 text-xs text-gray-300 rounded-md -top-1/3 left-1/4 mx-auto group-hover:opacity-100">
                           {nextDayIllustration && nextDayIllustration[1]}
                         </span>
                       </div>
@@ -230,67 +230,114 @@ const addAppropriateIllustration = (weathercode, isDay = 1) => {
     // Clear sky
     if (isDay === 1)
       // (day)
-      return ["https://i.ibb.co/xDpF63y/day-clear.png", "Sunny"];
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/clear-day.svg",
+        "Sunny",
+      ];
     //(night)
     else
       return [
-        "https://i.ibb.co/PrQfyk1/night-half-moon-clear.png",
+        "https://basmilius.github.io/weather-icons/production/fill/all/clear-night.svg",
         "Clear night",
       ];
-  } else if (weathercode === 1 || weathercode === 2 || weathercode === 3) {
-    if (isDay === 1) {
+  } else if (weathercode === 1 || weathercode === 2) {
+    if (isDay === 1)
       // Mainly clear (day)
       return [
-        "https://i.ibb.co/3YD4Bc1/day-partial-cloud.png",
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day.svg",
         "Partial Cloudy",
       ];
-    } else {
-      // Mainly clear (night)
+    // Mainly clear (night)
+    else
       return [
-        "https://i.ibb.co/6tLnLCR/night-full-moon-partial-cloud.png",
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-night.svg",
         "Partial Cloudy",
       ];
-    }
-  } else if (weathercode >= 45 && weathercode <= 48) {
+  } else if (weathercode === 3)
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/overcast.svg",
+      "Overcast",
+    ];
+  else if (weathercode >= 45 && weathercode <= 48)
     // Fog
-    return ["https://i.ibb.co/WpV7VDz/fog.png", "Fog"];
-  } else if (
-    (weathercode >= 51 && weathercode <= 67) ||
-    (weathercode >= 80 && weathercode <= 82)
-  ) {
-    if (isDay === 1) {
-      // Rain (day)
-      return ["https://i.ibb.co/pJxyNwy/day-rain.png", "Rainy"];
-    } else {
-      // Rain (night)
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/fog.svg",
+      "Fog",
+    ];
+  else if (weathercode === 51 || weathercode === 53) {
+    if (isDay === 1)
+      // Mainly clear (day)
       return [
-        "https://i.ibb.co/ZcQmh89/night-full-moon-rain.png",
-        "Rainy night",
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day-drizzle.svg",
+        "Partial Drizzle",
       ];
-    }
+    // Mainly clear (night)
+    else
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-night-drizzle.svg",
+        "Partial Drizzle",
+      ];
+  } else if (weathercode === 55)
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/drizzle.svg",
+      "Drizzle",
+    ];
+  else if (weathercode === 56 || weathercode === 66) {
+    if (isDay === 1)
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day-drizzle.svg",
+        "Partial Freezing Rain",
+      ];
+    else
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-night-drizzle.svg",
+        "Partial Freezing Rain",
+      ];
+  } else if (weathercode === 57 || weathercode === 67)
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/hail.svg",
+      "Freezing Rain",
+    ];
+  else if (weathercode === 61 || weathercode === 63) {
+    if (isDay === 1)
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day-rain.svg",
+        "Partial Rain",
+      ];
+    else
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-night-rain.svg",
+        "Partial Rain",
+      ];
+  } else if (weathercode === 65 || (weathercode >= 80 && weathercode <= 82))
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/rain.svg",
+      "Rain",
+    ];
+  else if (weathercode === 71 || weathercode === 73) {
+    if (isDay === 1)
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-day-snow.svg",
+        "Snow",
+      ];
+    else
+      return [
+        "https://basmilius.github.io/weather-icons/production/fill/all/partly-cloudy-night-snow.svg",
+        "Snow",
+      ];
   } else if (
-    (weathercode >= 71 && weathercode <= 77) ||
+    weathercode === 75 ||
+    weathercode === 77 ||
     weathercode === 85 ||
     weathercode === 86
-  ) {
-    if (isDay === 1)
-      // Snow (day)
-      return ["https://i.ibb.co/3rdTxwb/night-full-moon-snow.png", "Snowy"];
-    // Snow (night)
-    else
-      return [
-        "https://i.ibb.co/3rdTxwb/night-full-moon-snow.png",
-        "Snowy night",
-      ];
-  } else if (weathercode >= 95 && weathercode <= 99) {
-    // Thunder (day)
-    if (isDay === 1)
-      return ["https://i.ibb.co/gVmrPkV/day-rain-thunder.png", "Thunderstorm"];
-    // Thunder (night)
-    else
-      return [
-        "https://i.ibb.co/qxWQ9PY/night-full-moon-rain-thunder.png",
-        "Thunderstorm night",
-      ];
-  }
+  )
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/snow.svg",
+      "Heavy Snow",
+    ];
+  else if (weathercode >= 95 && weathercode <= 99)
+    return [
+      "https://basmilius.github.io/weather-icons/production/fill/all/thunderstorms.svg",
+      "Thunderstorm",
+    ];
 };
