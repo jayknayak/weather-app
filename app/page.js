@@ -205,12 +205,22 @@ const prepareWeatherData = (weatherData) => {
           (time) => new Date(time).getTime() >= new Date().getTime()
         )
       ) - 1;
-    const nextWeatherForecast = forecastTime.map((time, index) => ({
-      nextDay: weekDays[new Date(time).getDay()],
-      nextDayTempMax: Math.ceil(forecastTempMax[index]),
-      nextDayTempMin: Math.ceil(forecastTempMin[index]),
-      nextDayIllustration: addAppropriateIllustration(dailyWeatherCodes[index]),
-    }));
+    const nextWeatherForecast = forecastTime.map((time, index) => {
+      console.log(
+        "weekDay",
+        weekDays[new Date(time).getDay()],
+        new Date(time),
+        new Date(time).getDay()
+      );
+      return {
+        nextDay: weekDays[new Date(time).getDay()],
+        nextDayTempMax: Math.ceil(forecastTempMax[index]),
+        nextDayTempMin: Math.ceil(forecastTempMin[index]),
+        nextDayIllustration: addAppropriateIllustration(
+          dailyWeatherCodes[index]
+        ),
+      };
+    });
 
     return {
       currentTemperature: Math.ceil(current_weather.temperature),
