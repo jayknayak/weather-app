@@ -19,13 +19,13 @@ const getLiveWeatherData = async (latitude, longitude) => {
 };
 
 const weekDays = {
-  0: "Mon",
-  1: "Tue",
-  2: "Wed",
-  3: "Thu",
-  4: "Fri",
-  5: "Sat",
-  6: "Sun",
+  0: "Sun",
+  1: "Mon",
+  2: "Tue",
+  3: "Wed",
+  4: "Thu",
+  5: "Fri",
+  6: "Sat",
 };
 
 // This part is important!
@@ -205,22 +205,12 @@ const prepareWeatherData = (weatherData) => {
           (time) => new Date(time).getTime() >= new Date().getTime()
         )
       ) - 1;
-    const nextWeatherForecast = forecastTime.map((time, index) => {
-      console.log(
-        "weekDay",
-        weekDays[new Date(time).getDay()],
-        new Date(time),
-        new Date(time).getDay()
-      );
-      return {
-        nextDay: weekDays[new Date(time).getDay()],
-        nextDayTempMax: Math.ceil(forecastTempMax[index]),
-        nextDayTempMin: Math.ceil(forecastTempMin[index]),
-        nextDayIllustration: addAppropriateIllustration(
-          dailyWeatherCodes[index]
-        ),
-      };
-    });
+    const nextWeatherForecast = forecastTime.map((time, index) => ({
+      nextDay: weekDays[new Date(time).getUTCDay()],
+      nextDayTempMax: Math.ceil(forecastTempMax[index]),
+      nextDayTempMin: Math.ceil(forecastTempMin[index]),
+      nextDayIllustration: addAppropriateIllustration(dailyWeatherCodes[index]),
+    }));
 
     return {
       currentTemperature: Math.ceil(current_weather.temperature),
