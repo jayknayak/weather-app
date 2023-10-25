@@ -50,9 +50,9 @@ export default async function Home({ searchParams }) {
       );
   }
   return (
-    <main className="bg-[url('https://images.unsplash.com/photo-1444080748397-f442aa95c3e5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1932&q=80')] bg-cover bg-center flex justify-center items-center min-h-screen">
-      <div className="bg-white/30 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
-        <div className="bg-black/30 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
+    <main className="bg-[url('https://images.unsplash.com/photo-1446776811953-b23d57bd21aa?auto=format&fit=crop&q=80&w=2072&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D')] bg-cover bg-center flex justify-center items-center min-h-screen">
+      <div className="bg-black/20 w-[80vw] sm:w-[50vw] justify-center items-center p-2 rounded flex flex-col">
+        <div className="bg-black/40 w-full flex flex-col gap-2 p-2 justify-center items-center text-white">
           <DisplayCurrentTime />
           <GetCurrentLocation />
           <span className="text-2xl font-bold">{city}</span>
@@ -98,7 +98,7 @@ export default async function Home({ searchParams }) {
                     </p>
                   </div>
                 </div>
-                <div className="bg-black/30 flex py-2 px-2 items-center sm:px-4 gap-2 sm:gap-4">
+                <div className="bg-black/50 flex py-2 px-2 items-center sm:px-4 gap-2 sm:gap-4">
                   <div className="group relative flex flex-col items-center gap-1">
                     <FontAwesomeIcon
                       icon={faDroplet}
@@ -154,7 +154,7 @@ export default async function Home({ searchParams }) {
                     return (
                       <div
                         key={index}
-                        className="group relative bg-black/30 flex flex-row justify-around sm:flex-col flex-1 gap-1 p-1 items-center text-center"
+                        className="group relative bg-black/50 flex flex-row justify-around sm:flex-col flex-1 gap-1 p-1 items-center text-center"
                       >
                         <span className="text-sm sm:text-md">{nextDay}</span>
                         {/* <FontAwesomeIcon
